@@ -1,0 +1,80 @@
+body {
+    color: darkblue;
+    font-size:18px ;
+    font-family: 'Calibri', sans-serif;
+}
+
+hr {
+    width: auto;
+}
+
+#lorem {
+    margin: 0  auto;
+    width: 350px;
+    height: 150px;
+    border: 2px dashed darkblue;
+    padding:10px ;
+    text-align: justify;
+    background-color: transparent;
+    overflow: auto;
+    background-color: rgb(211, 218, 224);
+}
+
+#main {
+    font-weight: 200;
+    font-size: 45px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#text {
+    font-size:30px ;
+    text-align: center;
+}
+
+a {
+    color: green;
+    text-align: center;
+}
+
+table {
+    table-layout: fixed;
+    margin: 20px 42%;
+    border-collapse: collapse;
+    text-align: center;
+    padding:10px ;
+    width: 600px;
+}
+
+table td, table tr {
+    border: 1px solid grey;
+    padding:12px 30px ;
+}
+
+table tr:nth-child(2) {
+    background-color: #a0b6d1;
+}
+
+#colored-text {
+    text-align: center;
+    margin-top: 15px;
+}
+
+#red {
+    color: red;
+}
+
+#pink {
+    color: magenta;
+}
+
+#yellow {
+    color: orange;
+}
+
+ul {
+    list-style-type: circle;
+    text-align: left;
+    margin-top: 40px;
+    margin-left: 20px;
+}
