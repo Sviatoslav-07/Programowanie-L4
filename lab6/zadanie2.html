@@ -1,0 +1,112 @@
+<html>
+<head>
+ <meta charset="utf-8">
+ <style>
+ #reset {display:inline-block;}
+ #stop {display:none;}
+ </style>
+</head>
+<body>
+ <h1 id="czas">
+ <span id="godziny">00</span>:<span id="minuty">00</span>:<span id="sekundy">00</span>
+ </h1>
+ <button id = "start">START</button>
+ <button id = "zapisz">ZAPISZ</button>
+ <button id = "stop">STOP</button>
+ <button id = "reset">RESET</button>
+ <p id = "stan_stopera"></p>
+ <ul id = "zapisane_czasy">
+ </ul>
+ <script>
+let sekundy = 0;
+let minuty = 0;
+let godziny = 0;
+let interval = null;
+
+const elSek = document.getElementById("sekundy");
+const elMin = document.getElementById("minuty");
+const elGodz = document.getElementById("godziny");
+
+const startBtn = document.getElementById("start");
+const stopBtn = document.getElementById("stop");
+const resetBtn = document.getElementById("reset");
+const zapiszBtn = document.getElementById("zapisz");
+
+const stan = document.getElementById("stan_stopera");
+const lista = document.getElementById("zapisane_czasy");
+
+// formatowanie czasu
+function format(val) {
+    return val < 10 ? "0" + val : val;
+}
+
+// aktualizacja widoku
+function updateDisplay() {
+    elSek.textContent = format(sekundy);
+    elMin.textContent = format(minuty);
+    elGodz.textContent = format(godziny);
+}
+
+// start
+startBtn.addEventListener("click", () => {
+    if (interval) return;
+
+    interval = setInterval(() => {
+        sekundy++;
+        if (sekundy === 60) {
+            sekundy = 0;
+            minuty++;
+        }
+        if (minuty === 60) {
+            minuty = 0;
+            godziny++;
+        }
+        updateDisplay();
+    }, 1000);
+
+    stan.textContent = "Trwa odliczanie...";
+    
+    startBtn.style.display = "none";
+    stopBtn.style.display = "inline-block";
+    resetBtn.style.display = "none";
+});
+
+// stop
+stopBtn.addEventListener("click", () => {
+    clearInterval(interval);
+    interval = null;
+
+    stan.textContent = "Wstrzymano odliczanie.";
+
+    startBtn.style.display = "inline-block";
+    stopBtn.style.display = "none";
+    resetBtn.style.display = "inline-block";
+});
+
+// zapis
+zapiszBtn.addEventListener("click", () => {
+    const li = document.createElement("li");
+    li.textContent = `${format(godziny)}:${format(minuty)}:${format(sekundy)}`;
+    lista.appendChild(li);
+});
+
+// reset
+resetBtn.addEventListener("click", () => {
+    clearInterval(interval);
+    interval = null;
+
+    sekundy = 0;
+    minuty = 0;
+    godziny = 0;
+
+    updateDisplay();
+    lista.innerHTML = "";
+    stan.textContent = "";
+
+    startBtn.style.display = "inline-block";
+    stopBtn.style.display = "none";
+    resetBtn.style.display = "none";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Czas</title>
+</head>
+<body>
+    <h2>Czas w Polsce</h2>
+    <p id="czas">123</p>
+    <script>
+                fetch("https://timeapi.io/api/Time/current/zone?timeZone=Europe/Warsaw")
+                    .then(response => response.json())
+                    .then(data => {
+                        const godzina = data.hour.toString().padStart(2, '0')
+                        const minuta = data.minute.toString().padStart(2, '0')
+                        const sekunda = data.seconds.toString().padStart(2, '0')
+
+                        document.getElementById('czas').textContent = `${godzina}:${minuta}:${sekunda}`
+                    })
+                    .catch(error => {
+                        document.getElementById('czas').textcontent = "blad pobierania czasu"
+                        console.error(error)
+                    })
+    </script>
+</body>
+</html>
