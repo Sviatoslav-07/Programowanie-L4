@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Formularz rejestracji</title>
+<style>
+
+    label {
+        display: block;
+        margin-top: 10px;
+    }
+
+    input {
+        width: 400px;
+        padding: 8px;
+    }
+
+    .error {
+        color: red;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+
+
+    <h2>Formularz rejestracji</h2>
+
+    <form id="form">
+        <label>Nazwa użytkownika:</label>
+        <input type="text" id="username">
+
+        <label>Adres e-mail:</label>
+        <input type="text" id="email">
+
+        <label>Hasło:</label>
+        <input type="password" id="password">
+
+        <label>Powtórz hasło:</label>
+        <input type="password" id="confirmPassword">
+
+        <label>Data urodzenia:</label>
+        <input type="date" id="birthdate">
+
+        <label>Płeć:</label>
+        <select id="gender">
+            <option value="">-- wybierz --</option>
+            <option>Mężczyzna</option>
+            <option>Kobieta</option>
+            <option>Nie chcę podawać</option>
+        </select>
+
+        <div class="checkbox-group">
+            <input type="checkbox" id="terms"> Akceptuję regulamin
+        </div>
+
+        <div class="radio-group">
+            <label>Wersja:</label>
+            <input type="radio" name="version" value="Darmowa"> Darmowa<br>
+            <input type="radio" name="version" value="Standardowa"> Standardowa<br>
+            <input type="radio" name="version" value="Premium"> Premium
+        </div>
+
+        <button type="button" onclick="validateForm()">Zarejestruj się</button>
+        <button type="reset">Wyczyść</button>
+    </form>
+
+    <div class="error" id="error"></div>
+    <div class="result" id="result"></div>
+
+<script>
+function validateForm() {
+    let username = document.getElementById("username").value;
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
+    let confirmPassword = document.getElementById("confirmPassword").value;
+    let birthdate = document.getElementById("birthdate").value;
+    let gender = document.getElementById("gender").value;
+    let terms = document.getElementById("terms").checked;
+    let version = document.querySelector('input[name="version"]:checked');
+
+    let errorDiv = document.getElementById("error");
+    let resultDiv = document.getElementById("result");
+
+    errorDiv.innerHTML = "";
+    resultDiv.innerHTML = "";
+
+    if (!username || !email || !password || !confirmPassword || !birthdate || !gender || !version) {
+        errorDiv.innerHTML = "Wszystkie pola muszą być wypełnione!";
+        return;
+    }
+
+    if (!/^[a-zA-Z0-9]+$/.test(username)) {
+        errorDiv.innerHTML = "Nazwa użytkownika może zawierać tylko litery i cyfry!";
+        return;
+    }
+
+    if (password.length < 8 || !/\d/.test(password)) {
+        errorDiv.innerHTML = "Hasło musi mieć min. 8 znaków i zawierać cyfrę!";
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        errorDiv.innerHTML = "Hasła nie są takie same!";
+        return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errorDiv.innerHTML = "Niepoprawny adres e-mail!";
+        return;
+    }
+
+    let birth = new Date(birthdate);
+    let today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    let m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        age--;
+    }
+
+    if (age < 18) {
+        errorDiv.innerHTML = "Musisz mieć co najmniej 18 lat!";
+        return;
+    }
+
+    if (!terms) {
+        errorDiv.innerHTML = "Musisz zaakceptować regulamin!";
+        return;
+    }
+
+    let day = String(birth.getDate()).padStart(2, '0');
+    let month = String(birth.getMonth() + 1).padStart(2, '0');
+    let year = birth.getFullYear();
+    let formattedDate = `${day}.${month}.${year}`;
+
+    let hiddenPassword = "*".repeat(password.length);
+
+    resultDiv.innerHTML = `
+        <b>Nazwa użytkownika:</b> ${username}<br>
+        <b>Hasło:</b> ${hiddenPassword}<br>
+        <b>Adres e-mail:</b> ${email}<br>
+        <b>Data urodzenia:</b> ${formattedDate}<br>
+        <b>Płeć:</b> ${gender}<br>
+        <b>Wybrana wersja:</b> ${version.value}
+    `;
+}
+</script>
+
+</body>
+</html>
