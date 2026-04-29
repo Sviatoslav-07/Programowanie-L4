@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gra Clicker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background-color: #1e1e2e;
+            color: #cdd6f4;
+            margin-top: 50px;
+        }
+        .container {
+            background-color: #313244;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .score-display { font-size: 1.5em; color: #a6e3a1; margin-bottom: 20px; }
+        
+        button {
+            background-color: #89b4fa;
+            color: #11111b;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin: 10px;
+            font-weight: bold;
+        }
+        button:hover { background-color: #74c7ec; transform: scale(1.05); }
+        button:active { transform: scale(0.95); }
+        button:disabled { background-color: #585b70; color: #a6adc8; cursor: not-allowed; transform: none; }
+
+        .upgrades { margin-top: 30px; display: flex; flex-direction: column; gap: 10px; }
+        .upgrade-btn { background-color: #cba6f7; font-size: 1em; padding: 10px; }
+        .upgrade-btn:hover { background-color: #f38ba8; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Punkty: <span id="score">0</span></h1>
+        <div class="score-display">Pasywny dochód: <span id="passive-display">0</span>/s</div>
+        
+        <button id="main-click-btn">Kliknij Mnie!</button>
+
+        <div class="upgrades">
+            <h2>Sklep Ulepszeń</h2>
+            <button class="upgrade-btn" id="btn-upgrade-click">
+                Zwiększ moc kliknięcia (+1) <br> Koszt: <span id="cost-click">10</span> pkt
+            </button>
+            <button class="upgrade-btn" id="btn-upgrade-passive">
+                Kup pasywny dochód (+1/s) <br> Koszt: <span id="cost-passive">50</span> pkt
+            </button>
+            <button class="upgrade-btn" id="btn-reset" style="background-color: #f38ba8; margin-top: 20px;">
+                Zresetuj Grę
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // default
+        let gameState = {
+            score: 0,
+            clickPower: 1,
+            passiveIncome: 0,
+            clickUpgradeCost: 10,
+            passiveUpgradeCost: 50,
+            lastSaveTime: Date.now()
+        };
+
+        // elements
+        const scoreEl = document.getElementById('score');
+        const passiveDisplayEl = document.getElementById('passive-display');
+        const mainClickBtn = document.getElementById('main-click-btn');
+        const btnUpgradeClick = document.getElementById('btn-upgrade-click');
+        const btnUpgradePassive = document.getElementById('btn-upgrade-passive');
+        const costClickEl = document.getElementById('cost-click');
+        const costPassiveEl = document.getElementById('cost-passive');
+        const btnReset = document.getElementById('btn-reset');
+
+        //localstorage
+        function loadGame() {
+            const savedData = localStorage.getItem('clickerGameState');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                gameState = { ...gameState, ...parsedData };
+                }
+            }
+            updateUI();
+
+        // save
+        function saveGame() {
+            gameState.lastSaveTime = Date.now();
+            localStorage.setItem('clickerGameState', JSON.stringify(gameState));
+        }
+
+        // interface
+        function updateUI() {
+            scoreEl.innerText = Math.floor(gameState.score);
+            passiveDisplayEl.innerText = gameState.passiveIncome;
+            costClickEl.innerText = gameState.clickUpgradeCost;
+            costPassiveEl.innerText = gameState.passiveUpgradeCost;
+            btnUpgradeClick.disabled = gameState.score < gameState.clickUpgradeCost;
+            btnUpgradePassive.disabled = gameState.score < gameState.passiveUpgradeCost;
+        }
+
+        // click
+        mainClickBtn.addEventListener('click', () => {
+            gameState.score += gameState.clickPower;
+            updateUI();
+        });
+
+        // button upgrade
+        btnUpgradeClick.addEventListener('click', () => {
+            if (gameState.score >= gameState.clickUpgradeCost) {
+                gameState.score -= gameState.clickUpgradeCost;
+                gameState.clickPower += 1;
+                gameState.clickUpgradeCost = Math.floor(gameState.clickUpgradeCost * 1.25); 
+                updateUI();
+            }
+        });
+
+        btnUpgradePassive.addEventListener('click', () => {
+            if (gameState.score >= gameState.passiveUpgradeCost) {
+                gameState.score -= gameState.passiveUpgradeCost;
+                gameState.passiveIncome += 1;
+                gameState.passiveUpgradeCost = Math.floor(gameState.passiveUpgradeCost * 1.25);
+                updateUI();
+            }
+        });
+
+        // reset
+        btnReset.addEventListener('click', () => {
+            if (confirm("Czy na pewno chcesz zresetować postęp?")) {
+                localStorage.removeItem('clickerGameState');
+        
+        // reset default
+        gameState = {
+            score: 0,
+            clickPower: 1,
+            passiveIncome: 0,
+            clickUpgradeCost: 10,
+            passiveUpgradeCost: 50,
+            lastSaveTime: Date.now()
+        };
+        
+        saveGame();
+        updateUI();
+    }
+});
+
+        setInterval(() => {
+            if (gameState.passiveIncome > 0) {
+                gameState.score += gameState.passiveIncome;
+                updateUI();
+            }
+        }, 1000);
+
+        setInterval(saveGame, 5000);
+
+        window.addEventListener('beforeunload', saveGame);
+
+        loadGame();
+    </script>
+</body>
+</html>
